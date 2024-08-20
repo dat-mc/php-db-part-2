@@ -1,6 +1,6 @@
 <?php
 //TODO *сделать еще игру на сложение например, попробовать отделить логику игры и взаимодейсвтия с пользователем
-function randFunction(array $config): string
+function randFunction(): string
 {
     _log("Запуск игры угадай число");
 
@@ -18,10 +18,8 @@ function randFunction(array $config): string
             echo "Верно!" . PHP_EOL;
         } else {
             return handleError("'{$answer}' не правильный ответ. Правильный '{$correct}'.");
-
         }
     }
 
     return "Поздравляю, $name!";
 }
-

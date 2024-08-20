@@ -14,6 +14,8 @@ function handleHelp(): string
     $help .= "Доступные команды: \r\n";
     $help .= "rand - игра, \"Угадай число\"" . PHP_EOL;
     $help .= "help - помощь \r\n";
+    $help .= "posts - получить все посты\r\n";
+    $help .= "posts [ID] - получить пост по ID\r\n";
 
     return $help;
 }

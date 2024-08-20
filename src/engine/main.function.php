@@ -2,11 +2,9 @@
 
 //TODO организуйте файловую структуру src, вынесите файлы касающиеся движка в app  или engine core, game, blog
 
-function main(string $configFileAddress): string
+function main(): string
 {
-
-
-    $config = readConfig($configFileAddress);
+    $config = getConfig();
 
     if (!$config) {
         return handleError("Невозможно подключить файл настроек");
@@ -14,8 +12,8 @@ function main(string $configFileAddress): string
 
     $functionName = parseCommand();
 
-   if (function_exists($functionName)) {
-        $result = $functionName($config);
+    if (function_exists($functionName)) {
+        $result = $functionName();
     } else {
         $result = handleError("Вызываемая функция не существует");
     }
@@ -52,8 +50,13 @@ function readConfig(string $configAddress): array|false
     return parse_ini_file($configAddress, true);
 }
 
-//TODO убрать передачу конфига параметром и получать его внутре где нужно через эту функцию через Static
-function getConfig()
+function getConfig(): array
 {
+    static $config = [];
 
+    if (empty($config)) {
+        $config = readConfig(getcwd() . '/config.ini');
+    }
+
+    return $config;
 }
