@@ -76,3 +76,136 @@ function getPosts(): string
 
     return $table;
 }
+
+function apiGetPosts(): string
+{
+    $config = getConfig();
+    $db = @dbConnect($config);
+
+    $result = @pg_query($db, "SELECT id, title, preview from public.\"Posts\";");
+
+    if (!$result) {
+        return json_encode("Ошибка запроса "  . pg_last_error($db));
+    }
+
+    return json_encode([
+        'message' => 'Посты успешно получены',
+        'data' => pg_fetch_all($result),
+    ]);
+}
+
+function apiGetPostById(): string
+{
+    $config = getConfig();
+    $db = @dbConnect($config);
+
+    $id = (int) strip_tags($_GET['id']);
+
+    $result = @pg_prepare($db, "select", "SELECT id, title, preview from public.\"Posts\" where id=$1;");
+
+    $result = @pg_execute($db, "select", [$id]);
+
+    if (!$result) {
+        return json_encode("Ошибка запроса "  . pg_last_error($db));
+    }
+
+    return json_encode([
+        'message' => 'Пост успешно получен',
+        'data' => pg_fetch_all($result)[0],
+    ]);
+}
+
+function apiCreatePost()
+{
+    $config = getConfig();
+    $db = @dbConnect($config);
+
+    $title = strip_tags($_POST['title']);
+    $text = strip_tags($_POST['text']);
+    $preview = strip_tags($_POST['preview']);
+    $userId = strip_tags($_POST['userId']);
+    $categoryId = strip_tags($_POST['categoryId']);
+
+    $result = @pg_prepare($db, "insert", "
+        INSERT INTO public.\"Posts\" (title, \"text\", preview, user_id, category_id)
+        VALUES ($1, $2, $3, $4, $5)
+    ");
+
+    $result = @pg_execute($db, "insert", [$title, $text, $preview, $userId, $categoryId]);
+
+    if (!$result) {
+        return json_encode("Ошибка запроса "  . pg_last_error($db));
+    }
+
+    return json_encode([
+        'message' => 'Создан новый пост',
+        'data' => [
+            'title' => $title,
+            'text' => $text,
+            'preview' => $preview,
+            'userId' => $userId,
+            'categoryId' => $categoryId,
+        ]
+    ]);
+}
+
+function apiUpdatePost()
+{
+    $config = getConfig();
+    $db = @dbConnect($config);
+
+    $id = (int) strip_tags($_POST['id']);
+    $title = strip_tags($_POST['title']);
+    $text = strip_tags($_POST['text']);
+    $preview = strip_tags($_POST['preview']);
+    $userId = (int) strip_tags($_POST['userId']);
+    $categoryId = (int) strip_tags($_POST['categoryId']);
+
+    $result = @pg_prepare($db, "update", "
+        UPDATE public.\"Posts\"
+        SET title=$2,
+            category_id=$6,
+            user_id=$5,
+            \"text\"=$3,
+            preview=$4
+        WHERE id=$1
+    ");
+
+    $result = @pg_execute($db, "update", [$id, $title, $text, $preview, $userId, $categoryId]);
+
+    if (!$result) {
+        return json_encode("Ошибка запроса "  . pg_last_error($db));
+    }
+
+    return json_encode([
+        'message' => 'Обновлен пост',
+        'data' => [
+            'id' => $id,
+            'title' => $title,
+            'text' => $text,
+            'preview' => $preview,
+            'userId' => $userId,
+            'categoryId' => $categoryId,
+        ]
+    ]);
+}
+
+function apiDeletePost(): string
+{
+    $config = getConfig();
+    $db = @dbConnect($config);
+
+    $id = (int) strip_tags($_GET['id']);
+
+    $result = @pg_prepare($db, "delete", "DELETE FROM public.\"Posts\" where id=$1;");
+
+    $result = @pg_execute($db, "delete", [$id]);
+
+    if (!$result) {
+        return json_encode("Ошибка запроса "  . pg_last_error($db));
+    }
+
+    return json_encode([
+        'message' => 'Пост успешно удален',
+    ]);
+}
