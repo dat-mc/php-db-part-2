@@ -1,0 +1,27 @@
+{
+    "name": "ember/game",
+    "description": "my app",
+    "autoload": {
+        "psr-4": {
+            "Ember\\Game\\": "src/"
+        },
+        "files": [
+            "src/game.function.php",
+            "src/log.function.php",
+            "src/main.function.php",
+            "src/template.function.php",
+            "src/db.functions.php",
+            "src/blog.functions.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ember",
+            "email": "evebay@mail.ru"
+        }
+    ],
+    "require": {
+        "ext-pgsql": "*",
+        "fakerphp/faker": "^1.23"
+    }
+}
